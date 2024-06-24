@@ -1,0 +1,5 @@
+# IGNORE FOLDER
+target/
+# IGNORE FILE
+.DS_Store
+*.log
