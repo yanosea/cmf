@@ -1,3 +1,4 @@
+use crate::presentation::handler::constant::*;
 use crate::usecase::{
     execute_task::execute_task, get_tasks::get_tasks_from_makefile,
     select_task::select_task_with_fzf,
@@ -15,39 +16,41 @@ pub fn run() {
             match select_task_with_fzf(&task_names, &args) {
                 Ok(Some(selected_task)) => {
                     print!(
-                        "You selected: [{}]. Are you OK? (y/N): ",
-                        selected_task.red()
+                        "{}",
+                        PROMPT_SELECTED_TASK.replace("{}", &selected_task.red().to_string())
                     );
                     io::stdout().flush().unwrap();
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).unwrap();
-                    if input.trim().to_lowercase() == "y" {
+                    if input.trim().to_lowercase() == CONFIRM_YES {
                         println!(
                             "{}",
-                            format!("Selected task: {}", selected_task)
+                            MESSAGE_SELECTED_TASK
+                                .replace("{}", &selected_task)
                                 .blue()
                                 .underline()
                         );
                         if let Err(e) = execute_task(&selected_task) {
                             eprintln!(
                                 "{}",
-                                format!("Failed to execute task: {}", e.to_string()).red()
+                                format!("{}: {}", ERROR_FAILED_TO_EXECUTE_TASK, e.to_string())
+                                    .red()
                             );
                             exit(1);
                         }
                     } else {
-                        println!("{}", "No task selected".yellow());
+                        println!("{}", MESSAGE_NO_TASK_SELECTED.yellow());
                         exit(0);
                     }
                 }
                 Ok(None) => {
-                    println!("{}", "No task selected".yellow());
+                    println!("{}", MESSAGE_NO_TASK_SELECTED.yellow());
                     exit(0);
                 }
                 Err(e) => {
                     eprintln!(
                         "{}",
-                        format!("Failed to select task with fzf: {}", e.to_string()).red()
+                        format!("{}: {}", ERROR_FAILED_TO_SELECT_TASK, e.to_string()).red()
                     );
                     exit(1);
                 }
@@ -56,7 +59,7 @@ pub fn run() {
         Err(e) => {
             eprintln!(
                 "{}",
-                format!("Failed to get tasks from Makefile: {}", e.to_string()).red()
+                format!("{}: {}", ERROR_FAILED_TO_GET_TASKS, e.to_string()).red()
             );
             exit(1);
         }

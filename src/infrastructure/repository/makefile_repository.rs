@@ -1,4 +1,5 @@
 use crate::domain::model::task::Task;
+use crate::infrastructure::repository::constant::*;
 use std::fs::File;
 use std::io::Read;
 use toml::Value;
@@ -11,18 +12,18 @@ impl MakefileRepository {
     }
 
     pub fn get_tasks(&self) -> Result<Vec<Task>, std::io::Error> {
-        let mut file = File::open("Makefile.toml")?;
+        let mut file = File::open(PATH_MAKEFILE)?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
         let value: Value = toml::from_str(&contents).map_err(|err| {
             std::io::Error::new(
                 std::io::ErrorKind::Other,
-                format!("Failed to parse TOML: {}", err),
+                format!("{}: {}", ERROR_FAILED_TO_PARSE_TOML, err),
             )
         })?;
-        let tasks = value["tasks"].as_table().ok_or_else(|| {
-            std::io::Error::new(std::io::ErrorKind::Other, "Failed to read tasks from TOML")
+        let tasks = value[KEY_TASKS].as_table().ok_or_else(|| {
+            std::io::Error::new(std::io::ErrorKind::Other, ERROR_FAILED_TO_READ_TASKS)
         })?;
 
         Ok(tasks
