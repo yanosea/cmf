@@ -38,6 +38,13 @@ Arguments:
   task  ⚙️ Task name defined in Makefile.toml to execute.
 ```
 
+## 🔗 Dependencies
+
+You need to install the following tools to use `cmf`.
+
+- [cargo-make](https://github.com/sagiegurari/cargo-make)
+- [fzf](https://github.com/junegunn/fzf)
+
 ## 🔧 Installation
 
 <!-- TODO : set installation and uninstallation guide here
