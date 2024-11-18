@@ -26,7 +26,7 @@
 
 ## ℹ️ About
 
-`cmf` is the CLI tool to execute a task in `Makefile.toml` with fzf.
+`cmf` is the CLI tool to execute a task in `Makefile.toml` with `cargo-make` × `fzf`.
 
 ## 💻 Usage
 
