@@ -1,12 +1,12 @@
+mod application;
 mod domain;
 mod infrastructure;
-mod presentation;
-mod usecase;
+mod interface;
 
-use presentation::handler::cli_handler;
+use interface::controller::CliController;
 
-// main is the entry point of cmf.
-fn main() {
-    // run the CLI handler
-    cli_handler::run();
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let controller = CliController::new();
+    controller.run().await
 }

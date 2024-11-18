@@ -1,112 +1,72 @@
-use crate::infrastructure::repository::constant::*;
-use std::io::Write;
-use std::process::{Command, Stdio};
+use crate::application::port::repository::FzfSelector;
+use async_trait::async_trait;
+use tokio::process::Command;
 
-// FzfRepository is a struct to select a task by fzf.
 pub struct FzfRepository;
 
-// Implementation of FzfRepository.
 impl FzfRepository {
-    // new is a constructor of FzfRepository.
     pub fn new() -> Self {
-        FzfRepository
+        Self
     }
 
-    // select_task is a method to select a task by fzf.
-    // tasks &Vec<String> : is a reference to a vector of tasks.
-    // args  &Vec<String> : is a reference to a vector of arguments.
-    // Returns a Result of Option<String> or std::io::Error.
-    pub fn select_task(
+    fn process_args(&self, args: &[String]) -> Vec<String> {
+        let mut processed_args = Vec::new();
+        let mut i = 0;
+        while i < args.len() {
+            if args[i].starts_with("--") {
+                processed_args.push(args[i].clone());
+                if i + 1 < args.len() {
+                    processed_args.push(args[i + 1].clone());
+                }
+                i += 2;
+            } else {
+                processed_args.push("--query".to_string());
+                processed_args.push(args[i].clone());
+                i += 1;
+            }
+        }
+        processed_args
+    }
+}
+
+#[async_trait]
+impl FzfSelector for FzfRepository {
+    async fn select_from_list(
         &self,
-        tasks: &[String],
+        items: &[String],
         args: &[String],
-    ) -> Result<Option<String>, std::io::Error> {
-        // join tasks
-        let tasks = self.join_tasks_with_newline(tasks);
-        // join arguments
-        let concatenated_args = self.join_args_with_space(args);
-        // spawn fzf
-        let mut child = self.spawn_fzf(&concatenated_args)?;
-        // pass tasks to fzf
-        self.pass_tasks_to_fzf(&mut child, &tasks)?;
-        // wait for fzf
-        let output = self.wait_for_fzf(child)?;
-        // get selected task
-        self.get_selected_task(output)
-    }
+    ) -> Result<Option<String>, Box<dyn std::error::Error>> {
+        let input = items.join("\n");
 
-    // join_tasks_with_newline is a method to join tasks with a newline.
-    // tasks &Vec<String> : is a reference to a vector of tasks.
-    // Returns a String.
-    fn join_tasks_with_newline(&self, tasks: &[String]) -> String {
-        tasks.join("\n")
-    }
+        let mut command = Command::new("fzf");
 
-    // join_args_with_space is a method to join arguments with a space.
-    // args &Vec<String> : is a reference to a vector of arguments.
-    // Returns a String.
-    fn join_args_with_space(&self, args: &[String]) -> String {
-        args.join(" ")
-    }
+        let processed_args = self.process_args(args);
+        for arg in processed_args {
+            command.arg(arg);
+        }
 
-    // spawn_fzf is a method to spawn fzf.
-    // concatenated_args &str : is a reference to a string of concatenated arguments.
-    // Returns a Result of std::process::Child or std::io::Error.
-    fn spawn_fzf(&self, concatenated_args: &str) -> Result<std::process::Child, std::io::Error> {
-        Command::new(COMMAND_FZF)
-            .arg(ARG_QUERY)
-            .arg(concatenated_args)
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .spawn()
-            .map_err(|_| std::io::Error::new(std::io::ErrorKind::Other, ERROR_FAILED_TO_SPAWN_FZF))
-    }
+        let mut child = command
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .spawn()?;
 
-    // pass_tasks_to_fzf is a method to pass tasks to fzf.
-    // child &mut std::process::Child : is a mutable reference to a child process.
-    // tasks &str                     : is a reference to a string of tasks.
-    // Returns a Result of () or std::io::Error.
-    fn pass_tasks_to_fzf(
-        &self,
-        child: &mut std::process::Child,
-        tasks: &str,
-    ) -> Result<(), std::io::Error> {
-        child
-            .stdin
-            .as_mut()
-            .ok_or_else(|| {
-                std::io::Error::new(std::io::ErrorKind::Other, ERROR_FAILED_TO_OPEN_STDIN)
-            })?
-            .write_all(tasks.as_bytes())
-    }
+        if let Some(mut stdin) = child.stdin.take() {
+            use tokio::io::AsyncWriteExt;
+            stdin.write_all(input.as_bytes()).await?;
+        }
 
-    // wait_for_fzf is a method to wait for fzf.
-    // child std::process::Child : is a child process.
-    // Returns a Result of std::process::Output or std::io::Error.
-    fn wait_for_fzf(
-        &self,
-        child: std::process::Child,
-    ) -> Result<std::process::Output, std::io::Error> {
-        child.wait_with_output()
-    }
+        let output = child.wait_with_output().await?;
 
-    // get_selected_task is a method to get the selected task.
-    // output std::process::Output : is the output of the child process.
-    // Returns a Result of Option<String> or std::io::Error.
-    fn get_selected_task(
-        &self,
-        output: std::process::Output,
-    ) -> Result<Option<String>, std::io::Error> {
-        let selected_task = String::from_utf8(output.stdout)
-            .map_err(|_| {
-                std::io::Error::new(std::io::ErrorKind::Other, ERROR_FAILED_TO_CONVERT_OUTPUT)
-            })?
-            .trim()
-            .to_string();
-        if selected_task.is_empty() {
-            Ok(None)
+        if output.status.success() {
+            let selected = String::from_utf8(output.stdout)?;
+            let trimmed = selected.trim();
+            if trimmed.is_empty() {
+                Ok(None)
+            } else {
+                Ok(Some(trimmed.to_string()))
+            }
         } else {
-            Ok(Some(selected_task))
+            Ok(None)
         }
     }
 }
