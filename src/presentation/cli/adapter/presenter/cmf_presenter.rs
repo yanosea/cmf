@@ -1,14 +1,14 @@
-use crate::presentation::cli::adapter::formatter::CliFormatter;
+use crate::presentation::cli::adapter::formatter::CmfFormatter;
 use std::io::{self, Write};
 
-pub struct CliPresenter {
-    formatter: CliFormatter,
+pub struct CmfPresenter {
+    formatter: CmfFormatter,
 }
 
-impl CliPresenter {
+impl CmfPresenter {
     pub fn new() -> Self {
         Self {
-            formatter: CliFormatter::new(),
+            formatter: CmfFormatter::new(),
         }
     }
 

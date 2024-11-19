@@ -1,2 +1,2 @@
-pub mod cli_formatter;
-pub use cli_formatter::CliFormatter;
+pub mod cmf_formatter;
+pub use cmf_formatter::CmfFormatter;

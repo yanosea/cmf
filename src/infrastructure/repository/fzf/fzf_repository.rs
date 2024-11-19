@@ -1,10 +1,10 @@
-use crate::domain::repository::FzfRepository;
+use crate::domain::repository::FzfRepository as FzfRepositoryTrait;
 use async_trait::async_trait;
 use tokio::process::Command;
 
-pub struct FzfGateway;
+pub struct FzfRepositoryImpl;
 
-impl FzfGateway {
+impl FzfRepositoryImpl {
     pub fn new() -> Self {
         Self
     }
@@ -18,7 +18,7 @@ impl FzfGateway {
 }
 
 #[async_trait]
-impl FzfRepository for FzfGateway {
+impl FzfRepositoryTrait for FzfRepositoryImpl {
     async fn select_from_list(
         &self,
         items: &[String],

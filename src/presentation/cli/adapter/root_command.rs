@@ -1,26 +1,26 @@
-use super::cmf;
+use super::cmf_adapter;
 use crate::application::usecase::{ExecuteTaskUseCase, GetTasksUseCase, SelectTaskUseCase};
-use crate::infrastructure::gateway::{fzf::FzfGateway, makefile::MakefileGateway};
-use crate::presentation::cli::adapter::formatter::CliFormatter;
-use crate::presentation::cli::adapter::presenter::CliPresenter;
+use crate::infrastructure::repository::{fzf::FzfRepositoryImpl, makefile::MakefileRepository};
+use crate::presentation::cli::adapter::formatter::CmfFormatter;
+use crate::presentation::cli::adapter::presenter::CmfPresenter;
 use std::env;
 
 pub struct RootCommand {
-    makefile_usecase: GetTasksUseCase<MakefileGateway>,
-    cmf_usecase: SelectTaskUseCase<FzfGateway>,
+    makefile_usecase: GetTasksUseCase<MakefileRepository>,
+    cmf_usecase: SelectTaskUseCase<FzfRepositoryImpl>,
     cargo_usecase: ExecuteTaskUseCase,
-    cli_presenter: CliPresenter,
-    cli_formatter: CliFormatter,
+    cli_presenter: CmfPresenter,
+    cli_formatter: CmfFormatter,
 }
 
 impl RootCommand {
     pub fn new() -> Self {
         Self {
-            makefile_usecase: cmf::new_makefile_usecase(),
-            cmf_usecase: cmf::new_cmf_usecase(),
-            cargo_usecase: cmf::new_cargo_usecase(),
-            cli_presenter: cmf::new_cli_presenter(),
-            cli_formatter: cmf::new_cli_formatter(),
+            makefile_usecase: cmf_adapter::new_makefile_usecase(),
+            cmf_usecase: cmf_adapter::new_cmf_usecase(),
+            cargo_usecase: cmf_adapter::new_cargo_usecase(),
+            cli_presenter: cmf_adapter::new_cli_presenter(),
+            cli_formatter: cmf_adapter::new_cli_formatter(),
         }
     }
 

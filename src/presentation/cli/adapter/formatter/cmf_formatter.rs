@@ -1,8 +1,8 @@
 use colored::*;
 
-pub struct CliFormatter;
+pub struct CmfFormatter;
 
-impl CliFormatter {
+impl CmfFormatter {
     pub fn new() -> Self {
         Self
     }
