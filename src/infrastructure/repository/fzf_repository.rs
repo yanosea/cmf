@@ -10,22 +10,11 @@ impl FzfRepository {
     }
 
     fn process_args(&self, args: &[String]) -> Vec<String> {
-        let mut processed_args = Vec::new();
-        let mut i = 0;
-        while i < args.len() {
-            if args[i].starts_with("--") {
-                processed_args.push(args[i].clone());
-                if i + 1 < args.len() {
-                    processed_args.push(args[i + 1].clone());
-                }
-                i += 2;
-            } else {
-                processed_args.push("--query".to_string());
-                processed_args.push(args[i].clone());
-                i += 1;
-            }
+        if args.is_empty() {
+            return Vec::new();
         }
-        processed_args
+
+        vec!["--query".to_string(), args.join(" ")]
     }
 }
 
@@ -37,7 +26,6 @@ impl FzfSelector for FzfRepository {
         args: &[String],
     ) -> Result<Option<String>, Box<dyn std::error::Error>> {
         let input = items.join("\n");
-
         let mut command = Command::new("fzf");
 
         let processed_args = self.process_args(args);
