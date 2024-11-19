@@ -1,10 +1,10 @@
-use crate::application::port::repository::FzfSelector;
+use crate::domain::repository::FzfRepository;
 use async_trait::async_trait;
 use tokio::process::Command;
 
-pub struct FzfRepository;
+pub struct FzfGateway;
 
-impl FzfRepository {
+impl FzfGateway {
     pub fn new() -> Self {
         Self
     }
@@ -13,13 +13,12 @@ impl FzfRepository {
         if args.is_empty() {
             return Vec::new();
         }
-
         vec!["--query".to_string(), args.join(" ")]
     }
 }
 
 #[async_trait]
-impl FzfSelector for FzfRepository {
+impl FzfRepository for FzfGateway {
     async fn select_from_list(
         &self,
         items: &[String],

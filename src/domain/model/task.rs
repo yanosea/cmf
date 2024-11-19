@@ -1,4 +1,4 @@
-use crate::domain::value_object::task_name::TaskName;
+use super::task_name::TaskName;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Task {

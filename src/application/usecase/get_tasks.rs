@@ -1,5 +1,5 @@
-use crate::application::port::repository::TaskRepository;
-use crate::domain::entity::Task;
+use crate::domain::model::Task;
+use crate::domain::repository::TaskRepository;
 
 pub struct GetTasksUseCase<R: TaskRepository> {
     repository: R,

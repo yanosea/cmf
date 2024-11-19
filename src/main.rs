@@ -1,12 +1,7 @@
-mod application;
-mod domain;
-mod infrastructure;
-mod interface;
-
-use interface::controller::CliController;
+use cmf::presentation::cli::adapter::root_command::RootCommand;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let controller = CliController::new();
-    controller.run().await
+    let command = RootCommand::new();
+    command.execute().await
 }

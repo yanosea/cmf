@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 #[async_trait]
-pub trait FzfSelector {
+pub trait FzfRepository {
     async fn select_from_list(
         &self,
         items: &[String],

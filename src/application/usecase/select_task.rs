@@ -1,10 +1,10 @@
-use crate::application::port::repository::FzfSelector;
+use crate::domain::repository::FzfRepository;
 
-pub struct SelectTaskUseCase<F: FzfSelector> {
+pub struct SelectTaskUseCase<F: FzfRepository> {
     selector: F,
 }
 
-impl<F: FzfSelector> SelectTaskUseCase<F> {
+impl<F: FzfRepository> SelectTaskUseCase<F> {
     pub fn new(selector: F) -> Self {
         Self { selector }
     }

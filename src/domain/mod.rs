@@ -1,2 +1,2 @@
-pub mod entity;
-pub mod value_object;
+pub mod model;
+pub mod repository;

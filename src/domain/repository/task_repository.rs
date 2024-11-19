@@ -1,4 +1,4 @@
-use crate::domain::entity::Task;
+use crate::domain::model::Task;
 use async_trait::async_trait;
 
 #[async_trait]
