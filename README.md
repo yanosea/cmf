@@ -10,6 +10,7 @@
 
 ![Language:Rust](https://img.shields.io/static/v1?label=Language&message=Rust&color=orange&style=flat-square)
 ![License:MIT](https://img.shields.io/static/v1?label=License&message=MIT&color=blue&style=flat-square)
+
 <!-- TODO : set release status badge here
 [![Latest Release](https://img.shields.io/github/v/release/yanosea/cmf?style=flat-square)](https://github.com/yanosea/cmf/releases/latest)
 -->
@@ -32,10 +33,14 @@
 
 ```
 Usage:
-  cmf
+  cmf [options]
 
 Arguments:
   task  ⚙️ Task name defined in Makefile.toml to execute.
+
+Options:
+  --no-confirm  🚫 skip confirmation prompt before executing the task
+  -h, --help    🤝 help for cmf
 ```
 
 ## 🔗 Dependencies
